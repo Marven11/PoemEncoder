@@ -11,7 +11,7 @@ chars_dict = {
 
 chars = "".join(chars_dict.values())
 
-pattern = re.compile(r"[CHARS]{5}([，][CHARS]{5})*".replace("CHARS", chars))
+pattern = re.compile(r"[CHARS]{5}([，][\s\n]*[CHARS]{5})*".replace("CHARS", chars))
 
 patterns = [
     "anvan",
@@ -41,7 +41,7 @@ def decode(s: str) -> bytes | None:
     match = pattern.search(s)
     if not match or not match.group(0):
         return None
-    content = match.group(0).replace("，", "")
+    content = re.sub(r"[\s，]", "",  match.group(0))
     nums = [chars.index(c) for c in content for chars in chars_dict.values() if c in chars]
     compressed_hex = "".join(hex(n)[-1] for n in nums)
     return gzip.decompress(bytes.fromhex(compressed_hex))
@@ -52,7 +52,8 @@ def main():
     print(encoded)
     print(decode("""
 <h1>
-幽冢敛雅钟，敛钟钟淡曳，敛笛驿艳衔，帘明清冢静，寂雁雁朗寂，朗雁倚寂笠，踱蓑雁幽逐，朗雁溯雅蓑，凝蓑烟暗揽，栖蓑驿丽栖，清烬栖淡蓑，暗船驿明寂，明钟栖秀笠，揽烬苔灿逐，苔寂明钟明，明拂钟空明
+幽冢敛雅钟，敛钟钟淡曳，敛笛驿艳衔，帘明清冢静，寂雁雁朗寂，朗雁倚寂笠，踱蓑雁幽逐，朗雁溯雅蓑，
+凝蓑烟暗揽，栖蓑驿丽栖，清烬栖淡蓑，暗船驿明寂，明钟栖秀笠，揽烬苔灿逐，苔寂明钟明，明拂钟空明
 </h1>
 """))
 
